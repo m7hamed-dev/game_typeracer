@@ -1,20 +1,20 @@
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 // singleton design patteren
-class SocketClien {
+class SocketClient {
   late IO.Socket socket;
-  static SocketClien? _instance;
+  static SocketClient? _instance;
   //
-  SocketClien._internal() {
-    socket = IO.io('http://127.0.0.1:3000', <String, dynamic>{
+  SocketClient._internal() {
+    socket = IO.io('http://192.168.30.225:3000', <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
     });
     socket.connect();
   }
   //
-  static SocketClien get instance {
-    _instance ??= SocketClien._internal();
+  static SocketClient get instance {
+    _instance ??= SocketClient._internal();
     return _instance!;
   }
 }
