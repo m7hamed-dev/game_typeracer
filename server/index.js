@@ -1,8 +1,9 @@
+const { match } = require('assert');
 const express = require('express');
 const http = require('http');
 const mongoose = require('mongoose');
 const getSentence = require('./api/getSentence');
-const gameModel = require('./models/Game');
+const _GameModel = require('./models/Game');
 // create server
 const app = express();
 const port = process.env.PORT || 3000;
@@ -12,14 +13,37 @@ var io = require('socket.io')(server);
 app.use(express.json());
 // db config
 const db = 'mongodb+srv://moh:moh123@cluster0.jc9hn.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
-
-// listening to socket io events from the client ( flutter code ) 
+//
+const startGameClock = async(GAMEID) => {
+        let _game = await _GameModel.findById(GAMEID);
+        _game.startTime = new Date().getTime();
+        _game = await _game.save();
+        let _time = 60;
+        let timerID = setInterval((function getIntervalFunc() {
+            if (_time >= 0) {
+                const _timeFormat = calculateTime(_time);
+                io.to(GAMEID).emit('timer', {
+                    countDown: _timeFormat,
+                    msg: 'Timer Remaining'
+                });
+                console.log('time ', _time);
+                _time--;
+            }
+        }), 1000);
+    }
+    //
+const calculateTime = (yourTime) => {
+        let _min = Math.floor(yourTime / 60);
+        let _sec = yourTime % 60;
+        return `${_min}:${_sec < 10 ? "0" + _sec : _sec}`;
+    }
+    // listening to socket io events from the client ( flutter code ) 
 io.on('connection', (socket) => {
     console.log('connection with so cket id ', socket.id);
     // on create game
     socket.on('create-game', async({ nickname }) => {
         try {
-            let game = new gameModel();
+            let game = new _GameModel();
             const sentence = await getSentence();
             game.words = sentence;
             let player = {
@@ -35,6 +59,7 @@ io.on('connection', (socket) => {
             // client input -> client -> server -> mongoDB -> server -> client
             // io to means update to single id
             io.to(gameId).emit('updateGame', game);
+
             //
         } catch (error) {
             console.log('error on create game ', error);
@@ -47,7 +72,7 @@ io.on('connection', (socket) => {
                 socket.emit('notCorrectGame', 'Please Enter A valid Game ID');
                 return;
             }
-            let game = await gameModel.findById(gameID);
+            let game = await _GameModel.findById(gameID);
             //
             if (game.isJonin) {
                 const id = game._id.toString();
@@ -69,7 +94,7 @@ io.on('connection', (socket) => {
     // timer listener
     socket.on('timer', async({ playerId, gameID }) => {
         let countDown = 5;
-        let game = await gameModel.findById(gameID);
+        let game = await _GameModel.findById(gameID);
         // get one playe by pass player id
         let player = game.players.id(playerId);
         // console.log('player : ', player, ' game ', game);
@@ -86,6 +111,10 @@ io.on('connection', (socket) => {
                     console.log('countDown :::: ', countDown);
                     countDown--;
                 } else {
+                    game.isJoin = false;
+                    game = await game.save();
+                    io.to(gameID).emit('updateGame', game);
+                    startGameClock(gameID);
                     clearInterval(timerID);
                 }
             }, 1000);
@@ -93,7 +122,7 @@ io.on('connection', (socket) => {
     });
 });
 
-// 
+//  mongo part
 mongoose.connect(db).then(() => {
     console.log('connection successfuly !!');
 }).catch((e) => {
