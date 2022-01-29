@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'providers/client_state_provider.dart';
 import 'providers/game_state_provider.dart';
 import 'views/home_view.dart';
 
@@ -12,6 +13,9 @@ void main() {
       providers: [
         ChangeNotifierProvider<GameStateProvider>(
           create: (_) => GameStateProvider(),
+        ),
+        ChangeNotifierProvider<ClientStateProvider>(
+          create: (_) => ClientStateProvider(),
         )
       ],
       child: const MyApp(),

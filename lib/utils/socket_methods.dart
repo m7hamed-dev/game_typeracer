@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:game_typeracer/providers/client_state_provider.dart';
 import 'package:game_typeracer/providers/game_state_provider.dart';
 import 'package:game_typeracer/utils/push.dart';
 import 'package:game_typeracer/utils/socket_client.dart';
@@ -8,6 +9,7 @@ import 'package:provider/provider.dart';
 
 class SocketMethods {
   final _socketClient = SocketClient.instance.socket;
+  bool _isPlaying = false;
   // emit event to server
   void createGame(String nickName) {
     if (nickName.isNotEmpty) {
@@ -26,15 +28,19 @@ class SocketMethods {
   }
 
   void startTimer(String playerID, String gameID) {
-    // if (gameID.isNotEmpty && nickName.isNotEmpty) {
     _socketClient.emit(
       'timer',
       {'playerId': playerID, 'gameID': gameID},
     );
-    // }
   }
 
-  //61f23d9d5e8def5e472334ae
+  void sendUserInput(String value, String gameID) {
+    _socketClient.emit(
+      'userInput',
+      {'userInput': value, 'gameID': gameID},
+    );
+  }
+
   // listenrs event from server
   void updateGameListener(BuildContext context) {
     // listen event from server
@@ -48,14 +54,14 @@ class SocketMethods {
         players: data['players'],
         words: data['words'],
       );
-      if (data['_id'].isNotEmpty) {
+      if (data['_id'].isNotEmpty && !_isPlaying) {
         Push.to(context, const GameView());
+        _isPlaying = true;
       }
     });
   }
 
   void notCorrectGameListener(BuildContext context) {
-    // listen event from server
     _socketClient.on('notCorrectGame', (data) {
       return ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -63,6 +69,13 @@ class SocketMethods {
           content: Text('$data'),
         ),
       );
+    });
+  }
+
+  void updateTimeListener(BuildContext context) {
+    final _clientStateProvidr = context.read<ClientStateProvider>();
+    _socketClient.on('timer', (date) {
+      _clientStateProvidr.setClientState(date);
     });
   }
 }

@@ -1,0 +1,41 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "game_typeeracer",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "game_typeeracer (profile mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "Android",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "emulator-5554"
+        },
+        {
+            "name": "iPad Pro 12 Pro Max",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "638E7A0D-C019-4493-AB27-CF47262FC1E0"
+        },
+        
+    ],
+    "compounds": [
+        {
+            "name": "All Devices",
+            "configurations": [
+                "Android",
+                "iPad Pro 12 Pro Max",
+            ]
+        }
+    ]
+}

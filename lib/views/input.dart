@@ -12,6 +12,7 @@ class Input extends StatelessWidget {
   final int? maxLength;
   final bool? obscureText;
   final bool? autofocus;
+  final bool? readOnly;
   final bool? isShowBuildCounter;
   final ValueChanged? onChange;
   final Function? changeValueObScureText;
@@ -48,6 +49,7 @@ class Input extends StatelessWidget {
     this.suffixIcon,
     this.prefixIcon,
     this.height,
+    this.readOnly,
     this.contentPadding,
     this.textStyle,
     this.onFieldSubmitted,
@@ -63,12 +65,12 @@ class Input extends StatelessWidget {
   Widget build(BuildContext context) {
     //
     return TextFormField(
+      readOnly: readOnly ?? false,
       controller: controller,
       autofocus: autofocus ?? false,
       maxLength: maxLength ?? 80,
       maxLines: maxLines ?? 1,
       keyboardType: textInputType,
-
       textAlign: textAlign ?? TextAlign.center,
       // textDirection: TextDirection.rtl,
       // buildCounter: (BuildContext context,
