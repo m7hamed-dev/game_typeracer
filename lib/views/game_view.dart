@@ -104,9 +104,8 @@ class _GameTextFieldState extends State<GameTextField> {
     _socketMethods.startTimer(
         _playerMe['_id'], gameStateProvider.gameState['id']);
     //
-    setState(() {
-      _isBtn = false;
-    });
+    _isBtn = false;
+    setState(() {});
   }
 
   var _playerMe = {};
@@ -129,11 +128,11 @@ class _GameTextFieldState extends State<GameTextField> {
   final _wordsController = TextEditingController();
   //
   void _hundleTextChange(String value, String gameID) {
-    String _lastChar = value[value.length - 1];
+    var _lastChar = value[value.length - 1];
     if (_lastChar == ' ') {
       _socketMethods.sendUserInput(value, gameID);
       _wordsController.text = '';
-      setState(() {});
+      // setState(() {});
     }
   }
 
@@ -141,6 +140,7 @@ class _GameTextFieldState extends State<GameTextField> {
   @override
   Widget build(BuildContext context) {
     final _gameStateProvider = context.watch<GameStateProvider>();
+    //
     return _playerMe['isPartyLeader'] && _isBtn
         ? Padding(
             padding: const EdgeInsets.all(20.0),

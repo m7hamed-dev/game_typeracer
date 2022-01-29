@@ -40,8 +40,19 @@ class _SentenceGameState extends State<SentenceGame> {
     return Text(
       _typedWord,
       style: const TextStyle(
-        fontSize: 16.0,
+        fontSize: 18.0,
         color: Color.fromRGBO(52, 235, 119, 1),
+      ),
+    );
+  }
+
+  // 2 typed current word
+  Widget _getCurrentWord(List words, Map player) {
+    return Text(
+      words[player['currentWordIndex']],
+      style: const TextStyle(
+        decoration: TextDecoration.underline,
+        fontSize: 16.0,
       ),
     );
   }
@@ -53,9 +64,18 @@ class _SentenceGameState extends State<SentenceGame> {
     _findPlayerMe(_gameStateProvider);
     //
     return Container(
-      child: _getTypedWords(
-        _gameStateProvider.gameState['words'],
-        _playerMe,
+      padding: const EdgeInsets.all(10.0),
+      child: Wrap(
+        children: [
+          _getTypedWords(
+            _gameStateProvider.gameState['words'],
+            _playerMe,
+          ),
+          _getCurrentWord(
+            _gameStateProvider.gameState['words'],
+            _playerMe,
+          )
+        ],
       ),
     );
   }
